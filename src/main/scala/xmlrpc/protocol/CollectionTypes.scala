@@ -34,12 +34,12 @@ trait CollectionTypes extends Protocol {
         (key, value) <- map
       } yield inMember(inName(key) ++ toXmlrpc(value))).reduce(_ ++ _)
 
-      <struct>{struct}</struct>
+      <struct>{struct}</struct>.inValue
     }
 
     override def deserialize(from: NodeSeq): Deserialized[Map[String, T]] =
-      from \\ "struct" headOption match {
-        case Some(<struct>{members @ _*}</struct>) =>
+      from \\ "value" headOption match {
+        case Some(<value><struct>{members @ _*}</struct></value>) =>
           (for { member <- members }
             yield fromXmlrpc[T](member \ "value" head) map ((member \ "name" text) -> _))
             .toList
